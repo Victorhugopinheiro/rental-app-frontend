@@ -6,9 +6,6 @@ import { getCurrentUser } from 'aws-amplify/auth';
 
 import { Authenticator, Heading, Radio, RadioGroupField, useAuthenticator, View } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
-import { Sign } from 'crypto';
-import { signUp } from 'aws-amplify/auth';
-import { Form } from 'react-hook-form';
 import Footer from '../(nonDashboard)/landing/footer';
 import { usePathname, useRouter } from 'next/navigation';
 import path from 'path';

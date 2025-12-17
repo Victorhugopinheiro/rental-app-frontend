@@ -127,6 +127,10 @@ html, body, #root, .app {
 @layer base {
   * { @apply border-border; }
   body { @apply bg-background text-foreground; }
+  ::selection {
+    background-color: hsl(var(--color-primary));
+    color: hsl(var(--color-primary-foreground));
+  }
 }
 
 /* ===================== */
