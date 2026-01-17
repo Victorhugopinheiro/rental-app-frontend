@@ -44,9 +44,9 @@ export const globalSlice = createSlice({
     toggleFiltersFullOpen: (state) => {
       state.isFiltersFullOpen = !state.isFiltersFullOpen;
     },
-    setViewMode: (state, action: PayloadAction<"list" | "grid">) => {
+    setViewMode: (state, action: PayloadAction<"grid" | "list">) => {
       state.viewMode = action.payload;
-    }
+    },
   },
 });
 

@@ -31,7 +31,7 @@ export const FiltersFull = () => {
             const clearUrl = cleanParams(newFilter)
             const queryParams = new URLSearchParams()
 
-            Object.entries(cleanParams).forEach((key, value) => {
+            Object.entries(clearUrl).forEach((key, value) => {
 
                 queryParams.set(
                     String(key),
@@ -72,11 +72,35 @@ export const FiltersFull = () => {
         }))
     }
 
-    if(!filterFullOpen) return null
+
+    const handleLocationSearch = async () => {
+        try {
+            const response = await fetch(
+                `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+                    localFilters.location
+                )}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+                }&fuzzyMatch=true`
+            );
+            const data = await response.json();
+            if (data.features && data.features.length > 0) {
+                const [lng, lat] = data.features[0].center;
+                setLocalFilters((prev) => ({
+                    ...prev,
+                    coordinates: [lng, lat],
+                }));
+            }
+        } catch (err) {
+            console.error("Error search location:", err);
+        }
+    };
+
+
+
+    if (!filterFullOpen) return null
 
 
     return (
-        <div className="flex flex-col border w-full h-full px-10 overflow-auto justify-center items-center">
+        <div className="flex flex-col border w-full h-full px-2 overflow-auto justify-center items-center">
             <div className="flex gap-6 h-full w-full flex-col py-6">
 
                 <div>
@@ -103,7 +127,7 @@ export const FiltersFull = () => {
                         {Object.entries(PropertyTypeIcons).map(([key, Icon]) => (
 
                             <div key={key} className={`flex flex-col justify-center items-center m-2 p-2 border border-slate-400 
-                            rounded-lg cursor-pointer hover:bg-gray-200 ${filterAppSelector.propertyType === key ? "bg-black" : "bg-white"}`}
+                            rounded-lg cursor-pointer hover:bg-gray-200 ${localFilters.propertyType === key ? "bg-black text-white hover:bg-black" : "bg-white"}`}
                                 onClick={() => {
                                     setLocalFilters((prev) => ({
                                         ...prev,
@@ -219,13 +243,13 @@ export const FiltersFull = () => {
 
                 </div>
 
-                <div>
+                <div className="">
                     <p className="font-medium">Comodidades</p>
 
                     <div className="grid grid-cols-2">
                         {Object.entries(AmenityIcons).map(([key, Icon]) => (
                             <div key={key} className={`flex justify-center items-center m-2 p-2 border border-slate-400 
-                            rounded-lg cursor-pointer hover:bg-gray-200 ${filterAppSelector.propertyType === key ? "bg-black" : "bg-white"}`}
+                            rounded-lg cursor-pointer hover:bg-gray-200 ${localFilters.amenities.includes(key) ? "bg-black text-white" : "bg-white"}`}
                                 onClick={() => changeAmenities(key as AmenityEnum)}
 
                             >
@@ -256,7 +280,7 @@ export const FiltersFull = () => {
                     <Button onClick={() => resetFilters()} className="bg-red-500 hover:bg-red-600" variant={"outline"}>Deletar</Button>
 
 
-                    <Button onClick={() => handleSubmit()} className="bg-green-500 hover:bg-green-600" variant={"outline"}>Aplicar</Button>
+                    <Button onClick={() => handleSubmit()} className="bg-black text-white  " variant={"outline"}>Aplicar</Button>
 
 
                 </div>

@@ -15,7 +15,7 @@ import { DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@rad
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
 
 function Navbar() {
-    const { data: authUser } = useGetAuthUserQuery();
+    const { data: authUser, isLoading: isAuthUserLoading } = useGetAuthUserQuery();
     const router = useRouter();
     const { user } = useAuthenticator((context) => [context.user])
     const path = usePathname();
@@ -96,7 +96,7 @@ function Navbar() {
                                         <AvatarFallback>{authUser?.userRole[0].toUpperCase()}</AvatarFallback>
                                     </Avatar>
 
-                                    <span className='hidden md:block'>{authUser.userInfo.name}</span>
+                                    <span className='hidden md:block'>{authUser?.userInfo?.name ?? ""}</span>
 
                                 </DropdownMenuTrigger>
 
@@ -135,6 +135,9 @@ function Navbar() {
                     ) :
 
                         <>
+                            {isAuthUserLoading && user ? (
+                                <span className='text-sm text-gray-200'>Carregando...</span>
+                            ) : null}
                             <Link href={"/signin"}><Button variant='outline' className='hover:bg-white hover:text-black' size='sm'>Login</Button></Link>
                             <Link href={"/signup"}><Button variant='outline' className='bg-red-400 hover:bg-red-500' size='sm'>Cadastro</Button></Link>
                         </>
