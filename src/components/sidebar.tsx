@@ -56,7 +56,7 @@ function ApiSidebar() {
                 top: `${NAVBAR_HEIGHT}px`,
                 height: `calc(100vh - ${NAVBAR_HEIGHT}px)`,
             }}>
-            <SidebarHeader >
+            <SidebarHeader className=''>
                 <SidebarMenu className=''>
                     <SidebarMenuItem className={cn('flex flex-row justify-between px-4 py-2 border-b border-gray-300', open ? 'justify-between' : 'justify-center')}>
                         {open && (

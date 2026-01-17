@@ -1,5 +1,5 @@
 import { cleanParams, createNewUserInDatabase, withToast } from "@/lib/utils";
-import { Application, Manager, Property, Tenant } from "@/types/prismaTypes";
+import { Application, Lease, Manager, Payment, Property, Tenant } from "@/types/prismaTypes";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { fetchAuthSession, getCurrentUser } from 'aws-amplify/auth';
 import { FiltersState } from ".";
@@ -26,7 +26,7 @@ export const api = createApi({
 
   }),
   reducerPath: "api",
-  tagTypes: ["Tenants", "Managers", "Properties", "PropertyDetails", "Applications"],
+  tagTypes: ["Tenants", "Managers", "Properties", "PropertyDetails", "Applications", "Leases"],
   endpoints: (build) => ({
 
     getAuthUser: build.query<User, void>({
@@ -236,6 +236,59 @@ export const api = createApi({
 
         }
       }
+    }),
+    getUserLeases: build.query<LeaseWithPayments[], void>({
+      query: () => `/leasesUser`,
+      providesTags: (result) =>
+        result
+          ? [
+            ...result.map(({ id }) => ({ type: "Leases" as const, id })),
+            { type: "Leases", id: "LIST" },
+          ]
+          : [{ type: "Leases", id: "LIST" }],
+      transformResponse: (response: { userLeases: Lease[] }) => response.userLeases,
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await withToast(queryFulfilled, {
+            error: "Falha ao carregar contratos.",
+          });
+        } catch {
+
+        }
+      }
+    }),
+    getCurrentResidences: build.query<Property[], string>({
+      query: (cognitoId) => `/tenants/${cognitoId}/current-residences`,
+      providesTags: (result) =>
+        result
+          ? [
+            ...result.map(({ id }) => ({ type: "Properties" as const, id })),
+            { type: "Leases", id: "LIST" },
+          ]
+          : [{ type: "Leases", id: "LIST" }],
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await withToast(queryFulfilled, {
+            error: "Falha ao carregar contratos.",
+          });
+        } catch {
+
+        }
+      }
+
+    }),
+    getLeasePayments: build.query<Payment[], number>({
+      query: (leaseId) => `/leases/${leaseId}/payments`,
+      providesTags: (result, error, id) => [{ type: "Leases", id }],
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await withToast(queryFulfilled, {
+            error: "Failed to load lease payments.",
+          });
+        } catch {
+          // toast já foi exibido; evita unhandled promise no console
+        }
+      }
     })
 
 
@@ -244,5 +297,15 @@ export const api = createApi({
   })
 });
 
-export const { useGetAuthUserQuery, useGetProperiesQuery, useGetTenantQuery,
-  useAddFavoritePropertyMutation, useRemovePropertyMutation, useGetPropertyQuery, useCreateApplicationMutation } = api;
+export const {
+  useGetAuthUserQuery,
+  useGetProperiesQuery,
+  useGetTenantQuery,
+  useAddFavoritePropertyMutation,
+  useRemovePropertyMutation,
+  useGetPropertyQuery,
+  useCreateApplicationMutation,
+  useGetUserLeasesQuery,
+  useGetCurrentResidencesQuery,
+  useGetLeasePaymentsQuery
+} = api;
