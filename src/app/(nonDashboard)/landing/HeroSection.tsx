@@ -1,14 +1,56 @@
 "use client"
 
-import React from 'react'
+import React, { useState } from 'react'
 import logo from '../../../../public/landing-splash.jpg'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { useDispatch } from 'react-redux'
+import { setFilters } from '@/state'
+import { useRouter } from 'next/navigation'
 
 
 function HeroSection() {
+
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  const [locationValue, setLocationValue] = useState('') 
+
+  const handleLocationSearch = async () => {
+    try {
+      const trimmedQuery = locationValue.trim();
+      if (!trimmedQuery) return;
+
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+          trimmedQuery
+        )}.json?access_token=${
+          process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+        }&fuzzyMatch=true`
+      );
+      const data = await response.json();
+      if (data.features && data.features.length > 0) {
+        const [lng, lat] = data.features[0].center;
+        dispatch(
+          setFilters({
+            location: trimmedQuery,
+            coordinates: [lng, lat],
+          })
+        );
+        const params = new URLSearchParams({
+          location: trimmedQuery,
+          lat: lat.toString(),
+          lng: lng.toString(),
+        });
+        router.push(`/search?${params.toString()}`);
+      }
+    } catch (error) {
+      console.error("error search location:", error);
+    }
+  };
+
   return (
     <div className='relative h-screen min-h-screen  overflow-hidden '>
 
@@ -34,9 +76,9 @@ function HeroSection() {
 
 
         <div className='flex justify-center '>
-          <Input type='text' placeholder='Buscar apartamentos por localização, preço...'
+          <Input value={locationValue} onChange={(e) => setLocationValue(e.target.value)} type='text' placeholder='Buscar apartamentos por localização, preço...'
             className='w-full max-w-lg rounded-none rounded-l-xl h-12 border-none  bg-white text-black placeholder-gray-500' />
-          <Button className='bg-red-500 hover:bg-red-600 text-white  rounded-none rounded-r-xl h-12'>Buscar</Button>
+          <Button onClick={() => handleLocationSearch()} className='bg-red-500 hover:bg-red-600 text-white  rounded-none rounded-r-xl h-12'>Buscar</Button>
         </div>
 
       </motion.div>

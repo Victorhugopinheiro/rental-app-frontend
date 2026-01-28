@@ -24,7 +24,7 @@ function ApiSidebar() {
         {
             icon: FileText,
             label: "Aplicações",
-            href: "/managers/aplications"
+            href: "/managers/applications"
         },
         {
             icon: Settings,
@@ -46,6 +46,11 @@ function ApiSidebar() {
             icon: Settings,
             label: "Configurações",
             href: "/tenants/settings"
+        },
+         {
+            icon: Settings,
+            label: "Residências",
+            href: "/tenants/residences"
         }
         ]
 

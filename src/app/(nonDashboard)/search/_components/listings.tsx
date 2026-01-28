@@ -1,7 +1,7 @@
 
 import Card from "@/components/Card";
 import CardCompact from "@/components/CardCompacted";
-import { useAddFavoritePropertyMutation, useGetAuthUserQuery, useGetProperiesQuery, useGetTenantQuery, useRemovePropertyMutation } from "@/state/api"
+import { useAddFavoritePropertyMutation, useGetAuthUserQuery, useGetPropertiesQuery, useGetTenantQuery, useRemovePropertyMutation } from "@/state/api"
 import { useAppSelector } from "@/state/redux"
 import { Property } from "@/types/prismaTypes";
 
@@ -19,16 +19,22 @@ export default function Listings() {
     const viewMode = useAppSelector((state) => state.global.viewMode)
     const [removeFavorite] = useRemovePropertyMutation()
     const [addFavorite] = useAddFavoritePropertyMutation()
-    const { data: properties } = useGetProperiesQuery(filters)
+    const { data: properties } = useGetPropertiesQuery(filters)
 
 
 
-    const toggleFavorite = async (propertyId: number) => {
+    const handleFavoriteToggle = async (propertyId: number) => {
+     
+
+    
         if (!propertyId) return;
         if (!isTenant || !cognitoId) return;
 
 
-        const isFavorited = tenant?.favorites?.some((fav: Property) => fav.propertyId === propertyId);
+        const isFavorited = tenant?.favorites?.some((fav: Property) => fav.id === propertyId);
+
+
+      
 
         if (isFavorited) {
             await removeFavorite({ cognitoId, propertyId })
@@ -54,19 +60,21 @@ export default function Listings() {
                 <div className="p-4 w-full">
                     {properties?.length !== 0 && properties?.map((property, index) =>
                         viewMode === "grid" ? (
-                            <Card  key={index}
-                                isFavorite={tenant?.favorites?.some((fav: Property) => fav.propertyId === property.propertyId)}
+                            <Card key={index}
+                                isFavorite={tenant?.favorites?.some((fav: Property) => fav.id === property.id)}
                                 property={property}
-                                onFavoriteToggle={() => toggleFavorite(property.propertyId)}
+                                onFavoriteToggle={() => handleFavoriteToggle(property.id)}
                                 propertyLink={`/search/${property.id}`}
+                                showFavoriteButton={true}
                             />
                         ) : (
                             <CardCompact
-                                isFavorite={tenant?.favorites?.some((fav: Property) => fav.propertyId === property.propertyId)}
+                                isFavorite={tenant?.favorites?.some((fav: Property) => fav.id === property.id)}
                                 key={index}
                                 property={property}
-                                onFavoriteToggle={() => toggleFavorite(property.propertyId)}
+                                onFavoriteToggle={() => handleFavoriteToggle(property.id)}
                                 propertyLink={`/search/${property.id}`}
+                                showFavoriteButton={true}
                             />
                         )
 

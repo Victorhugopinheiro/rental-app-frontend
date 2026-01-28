@@ -33,7 +33,7 @@ const Residences = () => {
   if (error) return <div>Error loading current residences</div>;
 
   return (
-    <div className="dashboard-container">
+    <div  className={`h-[calc(100vh-4rem)] overflow-y-auto p-6`}>
       <Header
         title="Current Residences"
         subtitle="View and manage your current living spaces"
@@ -44,7 +44,7 @@ const Residences = () => {
             key={property.id}
             property={property}
             isFavorite={tenant?.favorites.includes(property.id) || false}
-            onFavoriteToggle={() => {}}
+            onFavoriteToggle={() => { }}
             showFavoriteButton={false}
             propertyLink={`/tenants/residences/${property.id}`}
           />

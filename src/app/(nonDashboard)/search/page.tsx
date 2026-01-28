@@ -42,7 +42,7 @@ export default function SearchPage() {
                 acc[key] = value.split(',').map((value) => Number(value))
             }
             else if (key === "amenities") {
-                acc[key] = value.split(","); // garante array
+                acc[key] = value.split(","); 
             }
             else {
                 acc[key] = value === "any" ? null : value

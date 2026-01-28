@@ -80,7 +80,7 @@ export const NavbarSearch = () => {
                 dispach(
                     setFilters({
                        location: inputValue,
-                       coordinates: [lat, lng],
+                       coordinates: [lng, lat],
                     })
                 )
             }
@@ -125,7 +125,7 @@ export const NavbarSearch = () => {
                         <Input value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             type="text" placeholder="Search properties..." className="w-64  rounded-r-none border-gray-400" />
-                        <Search className=" h-9  right-10  border rounded-r border-gray-400  " />
+                        <Search onClick={() => handleLocationSearch()} className=" h-9  right-10  border rounded-r border-gray-400  " />
                     </div>
 
                     <Select

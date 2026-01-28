@@ -17,7 +17,7 @@ function layout({ children }: { children: React.ReactNode }) {
 
                 <Navbar />
 
-                <main style={{ paddingTop: 40 }} className={`h-full flex w-full flex-row gap-4 `}>
+                <main style={{ paddingTop: 60 }} className={`h-full flex w-full flex-row gap-4 `}>
 
                     <div>
                         <Sidebar />

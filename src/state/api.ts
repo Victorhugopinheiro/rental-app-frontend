@@ -4,6 +4,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { fetchAuthSession, getCurrentUser } from 'aws-amplify/auth';
 import { FiltersState } from ".";
 import { number } from "zod";
+import { result } from "lodash";
 
 
 export const api = createApi({
@@ -111,10 +112,8 @@ export const api = createApi({
 
 
     }),
-    getProperies: build.query<Property[], Partial<FiltersState> & { favoritesIds?: number[] }>({
+    getProperties: build.query<Property[], Partial<FiltersState> & { favoritesIds?: number[] }>({
       query: (filters) => {
-
-
         const params = cleanParams({
           location: filters.location,
           priceMin: filters.priceRange?.[0],
@@ -150,6 +149,20 @@ export const api = createApi({
         }
       },
 
+    }),
+    getProperty: build.query<Property, number>({
+      query: (id) => `/properties/${id}`,
+      providesTags: (result, error, id) => [{ type: "PropertyDetails", id }],
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await withToast(queryFulfilled, {
+            success: "Added to favorites!!",
+            error: "Failed to add to favorites",
+          });
+        } catch {
+
+        }
+      }
     }),
     getTenant: build.query<Tenant, string>({
       query: (cognitoId) => `/tenants/${cognitoId}`,
@@ -205,20 +218,7 @@ export const api = createApi({
         }
       }
     }),
-    getProperty: build.query<Property, number>({
-      query: (id) => `/properties/${id}`,
-      providesTags: (result, error, id) => [{ type: "PropertyDetails", id }],
-      async onQueryStarted(_, { queryFulfilled }) {
-        try {
-          await withToast(queryFulfilled, {
-            success: "Added to favorites!!",
-            error: "Failed to add to favorites",
-          });
-        } catch {
 
-        }
-      }
-    }),
     createApplication: build.mutation<Application, Partial<Application>>({
       query: (body) => ({
         method: "POST",
@@ -238,7 +238,7 @@ export const api = createApi({
       }
     }),
     getUserLeases: build.query<LeaseWithPayments[], void>({
-      query: () => `/leasesUser`,
+      query: () => `/leases/leasesUser`,
       providesTags: (result) =>
         result
           ? [
@@ -286,9 +286,106 @@ export const api = createApi({
             error: "Failed to load lease payments.",
           });
         } catch {
-          // toast já foi exibido; evita unhandled promise no console
+
         }
       }
+    }),
+    getManagerProperties: build.query<Property[], string>({
+      query: (managerId) => `/managers/${managerId}/properties`,
+      providesTags: (result) =>
+        result
+          ? [
+            ...result.map(({ id }) => ({ type: "Properties" as const, id })),
+            { type: "Properties", id: "LIST" },
+          ]
+          : [{ type: "Properties", id: "LIST" }],
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await withToast(queryFulfilled, {
+            error: "Falha ao procurar propriedades.",
+          });
+        } catch {
+
+        }
+      },
+
+    }),
+    getPropertyLeases: build.query<Lease[], number>({
+      query: (propertyId) => `/properties/${propertyId}/leases`,
+      providesTags: (result, error, id) => [{ type: "Leases", id }],
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await withToast(queryFulfilled, {
+            error: "Falha ao procurar propriedades.",
+          });
+        } catch {
+
+        }
+      },
+    }),
+    createProperty: build.mutation<Property, FormData>({
+      query: (newProperty) => ({
+        method: "POST",
+        url: `properties`,
+        body: newProperty
+      }),
+      invalidatesTags: (result) => [
+        { type: "Properties", id: "LIST" },
+        { type: "Managers", id: result?.manager?.id },
+      ],
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await withToast(queryFulfilled, {
+            error: "Falha ao procurar propriedades.",
+          });
+        } catch {
+
+        }
+      },
+
+    }),
+    getApplications: build.query<Application[], { userId?: string, userRole?: string }>({
+      query: ({ userId, userRole }) => {
+        const queryParams = new URLSearchParams()
+
+        if (userId) {
+          queryParams.append("userId", userId.toString())
+        }
+
+        if (userRole) {
+          queryParams.append("userRole", userRole)
+        }
+
+        return `applications?${queryParams.toString()}`
+
+      },
+      providesTags: ["Applications"],
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await withToast(queryFulfilled, {
+            error: "Falha ao procurar propriedades.",
+          });
+        } catch {
+
+        }
+      },
+    }),
+    updateApplicationStatus: build.mutation<Application & { lease?: Lease }, { applicationId: string, status: string }>({
+      query: ({ applicationId, status }) => ({
+        method: "PUT",
+        url: `applications/${applicationId}/status`,
+        body: { status }
+      }),
+      invalidatesTags: ["Applications", "Leases"],
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await withToast(queryFulfilled, {
+            error: "Falha ao procurar propriedades.",
+          });
+        } catch {
+
+        }
+      },
     })
 
 
@@ -299,7 +396,7 @@ export const api = createApi({
 
 export const {
   useGetAuthUserQuery,
-  useGetProperiesQuery,
+  useGetPropertiesQuery,
   useGetTenantQuery,
   useAddFavoritePropertyMutation,
   useRemovePropertyMutation,
@@ -307,5 +404,10 @@ export const {
   useCreateApplicationMutation,
   useGetUserLeasesQuery,
   useGetCurrentResidencesQuery,
-  useGetLeasePaymentsQuery
+  useGetLeasePaymentsQuery,
+  useGetManagerPropertiesQuery,
+  useGetPropertyLeasesQuery,
+  useCreatePropertyMutation,
+  useUpdateApplicationStatusMutation,
+  useGetApplicationsQuery
 } = api;

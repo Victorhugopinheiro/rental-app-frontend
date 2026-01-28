@@ -1,4 +1,4 @@
-import { useGetProperiesQuery } from "@/state/api";
+import { useGetPropertiesQuery } from "@/state/api";
 import { useAppSelector } from "@/state/redux";
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
@@ -13,7 +13,7 @@ export default function Map() {
     const mapContainerRef = useRef(null)
     const filters = useAppSelector((state) => state.global.filters)
 
-    const { data: properties, isError, isLoading } = useGetProperiesQuery(filters)
+    const { data: properties, isError, isLoading } = useGetPropertiesQuery(filters)
 
     useEffect(() => {
         if (isLoading || isError) return;
@@ -22,8 +22,8 @@ export default function Map() {
 
             container: mapContainerRef.current!,
             style: 'mapbox://styles/mapbox/standard', // Use the standard style for the map
-            projection: 'globe', // display the map as a globe
-            zoom: 9, // initial zoom level, 0 is the world view, higher values zoom in
+           
+            zoom: 9, 
             center: filters.coordinates || [-74.5, 40]
 
         });
