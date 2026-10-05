@@ -32,6 +32,7 @@ const ApplicationModal = ({
   });
 
   const onSubmit = async (data: ApplicationFormData) => {
+    alert("Application submitted")
     if (!authUser || authUser.userRole !== "tenant") {
       console.error(
         "You must be logged in as a tenant to submit an application"
@@ -39,6 +40,8 @@ const ApplicationModal = ({
       return;
     }
 
+
+    alert("Creating application...")
     await createApplication({
       ...data,
       applicationDate: new Date().toISOString(),
@@ -81,7 +84,7 @@ const ApplicationModal = ({
               type="textarea"
               placeholder="Enter any additional information"
             />
-            <Button type="submit" className="bg-primary-700 text-white w-full">
+            <Button type="submit" className="bg-black text-white w-full hover:bg-gray-800">
               Submit Application
             </Button>
           </form>

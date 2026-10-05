@@ -100,7 +100,7 @@ const ApplicationCard = ({
                 alt={contactPerson.name}
                 width={40}
                 height={40}
-                className="rounded-full mr-2 min-w-[40px] min-h-[40px]"
+                className="rounded-full mr-2 min-w-10 min-h-10"
               />
             </div>
             <div className="flex flex-col gap-2">

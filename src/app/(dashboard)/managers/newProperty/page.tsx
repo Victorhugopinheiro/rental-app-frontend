@@ -34,12 +34,13 @@ export default function NewPropertyPage() {
             beds: 1,
             baths: 1,
             squareFeet: 1000,
+            propertyType: "",
             address: "",
             city: "",
             state: "",
             country: "",
             postalCode: "",
-            propertyType: PropertyTypeEnum.Apartment,  // ✅ enum
+            
         },
     });
 
